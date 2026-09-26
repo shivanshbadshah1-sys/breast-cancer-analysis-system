@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+uploads/
+static/chart.png
+static/graph.png
+static/prediction_result.csv

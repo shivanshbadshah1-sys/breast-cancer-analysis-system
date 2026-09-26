@@ -1084,16 +1084,26 @@ def download_report():
 # ── CHATBOT WITH GEMINI ──────────────────────────────────────────────────────
 
 # Configure Gemini API
-GEMINI_API_KEY = "AIzaSyA9VrCtKel2E2_Fg5WkeNIj7FoNQYDF91g"
-genai.configure(api_key=GEMINI_API_KEY)
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
+    print("⚠️ GEMINI_API_KEY not found. Gemini chatbot will be disabled.")
 
 # Initialize Gemini model
 try:
-    gemini_model = genai.GenerativeModel('gemini-1.5-flash')
-    GEMINI_ENABLED = True
-    print("✅ Gemini AI initialized successfully!")
+    if GEMINI_API_KEY:
+        gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+        GEMINI_ENABLED = True
+        print("✅ Gemini AI initialized successfully!")
+    else:
+        gemini_model = None
+        GEMINI_ENABLED = False
+
 except Exception as e:
     print(f"❌ Gemini initialization failed: {e}")
+    gemini_model = None
     GEMINI_ENABLED = False
 
 # Store chat sessions per user
