@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">
+  <i class="fas fa-ribbon" style="color:#ff4da6"></i> MedAI Predictor
+</span>
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/history">📋 History</a>
+        <a href="/appointments">📋 View Appointments</a>
+    </div>
+</nav>
+
+
+<div class="container">
+    <div class="card" style="max-width: 480px; margin: 0 auto;">
+        <h2>🏥 Book Appointment</h2>
+        <p class="subtitle">Schedule a consultation with a specialist</p>
+
+        {% if success %}
+        <div class="alert alert-success">{{ success }}</div>
+        {% endif %}
+
+        <form action="/book" method="POST">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" name="phone" placeholder="Enter phone number" required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="Enter email" required>
+            </div>
+            <div class="form-group">
+                <label>Preferred Date</label>
+                <input type="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label>Select Doctor</label>
+                <select name="doctor" required class="form-select">
+                    <option value="">-- Choose a Doctor --</option>
+                    <option>Dr. Rajiv Sharma (Oncologist)</option>
+                    <option>Dr. Neha Verma (General Physician)</option>
+                    <option>Dr. Gupta (Cancer Specialist)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Preferred Time</label>
+                <select name="time" required class="form-select">
+                    <option value="">-- Choose a Time --</option>
+                    <option>10:00 AM</option>
+                    <option>12:00 PM</option>
+                    <option>03:00 PM</option>
+                    <option>05:00 PM</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-danger">📅 Confirm Appointment</button>
+        </form>
+
+        <div class="action-row" style="margin-top: 20px;">
+            <a href="/" class="btn btn-secondary">⬅ Back to Home</a>
+        </div>
+    </div>
+            <!-- Appointments List -->
+            {% if appointments and appointments|length > 0 %}
+            <div class="card" style="margin-top: 30px;">
+                <h3>📋 Your Appointments</h3>
+                <div class="table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Booked On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apt in appointments %}
+                            <tr>
+                                <td>{{ apt.id }}</td>
+                                <td>{{ apt.name }}</td>
+                                <td>{{ apt.phone }}</td>
+                                <td>{{ apt.email }}</td>
+                                <td>{{ apt.doctor }}</td>
+                                <td>{{ apt.date }}</td>
+                                <td>{{ apt.time }}</td>
+                                <td>{{ apt.booked_on }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dietary Restrictions & Nutrition Guide</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">
+      <i class="fas fa-ribbon" style="color:#ff4da6"></i> MedAI Predictor
+    </span>
+
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/history">📋 History</a>
+        <a href="/appointment">📅 Appointment</a>
+    </div>
+</nav>
+
+<div class="container">
+    
+    <div class="card dietary-header">
+        <h2>🥗 Dietary Restrictions & Nutrition Guide</h2>
+        <p style="color: #f0af80; font-size: 14px; margin-bottom: 20px;">Personalized dietary recommendations based on your diagnosis</p>
+        
+        {% if result %}
+        <div class="diagnosis-badge {{ 'badge-malignant' if result == 'Malignant' else 'badge-benign' }}">
+            Diagnosis: {{ result }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Foods to AVOID -->
+    <div class="card dietary-card avoid-card">
+        <h3>🚫 Foods to AVOID</h3>
+        <p class="diet-explain">These foods may increase inflammation or interfere with treatment</p>
+        
+        <div class="food-grid">
+            {% for item in foods_to_avoid %}
+            <div class="food-item avoid-item">
+                <div class="food-icon">{{ item.icon }}</div>
+                <div class="food-name">{{ item.name }}</div>
+                <div class="food-reason">{{ item.reason }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Foods to INCLUDE -->
+    <div class="card dietary-card include-card">
+        <h3>✅ Foods to INCLUDE</h3>
+        <p class="diet-explain">These foods support healing and boost immunity</p>
+        
+        <div class="food-grid">
+            {% for item in foods_to_include %}
+            <div class="food-item include-item">
+                <div class="food-icon">{{ item.icon }}</div>
+                <div class="food-name">{{ item.name }}</div>
+                <div class="food-reason">{{ item.reason }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Allergy Information -->
+    <div class="card allergy-card">
+        <h3>⚠️ Common Allergies & Sensitivities</h3>
+        <p class="diet-explain">Be aware of these potential allergens during treatment</p>
+        
+        <div class="allergy-list">
+            {% for allergy in allergies %}
+            <div class="allergy-item">
+                <div class="allergy-header">
+                    <span class="allergy-icon">{{ allergy.icon }}</span>
+                    <span class="allergy-name">{{ allergy.name }}</span>
+                </div>
+                <div class="allergy-desc">{{ allergy.description }}</div>
+                <div class="allergy-symptoms">
+                    <strong>Symptoms:</strong> {{ allergy.symptoms }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sample Meal Plan -->
+    <div class="card meal-plan-card">
+        <h3>🍽️ Sample Daily Meal Plan</h3>
+        
+        <div class="meal-timeline">
+            {% for meal in meal_plan %}
+            <div class="meal-block">
+                <div class="meal-time">{{ meal.time }}</div>
+                <div class="meal-content">
+                    <div class="meal-title">{{ meal.title }}</div>
+                    <ul class="meal-items">
+                        {% for item in meal.meal_items %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Hydration & Supplements -->
+    <div class="card supplements-card">
+        <h3>💧 Hydration & Supplements</h3>
+        
+        <div class="supplement-grid">
+            <div class="supplement-item">
+                <div class="supp-icon">💧</div>
+                <div class="supp-title">Water Intake</div>
+                <div class="supp-desc">{{ hydration.water }}</div>
+            </div>
+            
+            {% for supp in supplements %}
+            <div class="supplement-item">
+                <div class="supp-icon">{{ supp.icon }}</div>
+                <div class="supp-title">{{ supp.name }}</div>
+                <div class="supp-desc">{{ supp.description }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Important Notes -->
+    <div class="card notes-card">
+        <h3>📝 Important Notes</h3>
+        <ul class="notes-list">
+            <li>Always consult your oncologist before making major dietary changes</li>
+            <li>Inform your doctor about any supplements you're taking</li>
+            <li>Keep a food diary to track reactions during treatment</li>
+            <li>Adjust portions based on your appetite and energy levels</li>
+            <li>Stay hydrated, especially during chemotherapy</li>
+        </ul>
+    </div>
+
+    <div class="action-row">
+        <a href="javascript:history.back()" class="btn btn-secondary">⬅ Back to Results</a>
+        <a href="/" class="btn btn-outline">🏠 Home</a>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Print Guide</button>
+    </div>
+
+</div>
+
+<!-- Chatbot -->
+<div id="chatbot-icon" onclick="toggleChat()" title="Ask Health Assistant">🤖</div>
+<div id="chatbox">
+    <div id="chat-header">
+        🤖 Health Assistant
+        <span onclick="toggleChat()" style="float:right; cursor:pointer;">✕</span>
+    </div>
+    <div id="messages"></div>
+    <div id="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ask about your diet..."
+               onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
+

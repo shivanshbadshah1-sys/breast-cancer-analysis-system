@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">
+  <i class="fas fa-ribbon" style="color:#ff4da6"></i> MedAI Predictor
+</span>
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/appointment">📅 Appointment</a>
+        <a href="/login">🔐 Dashboard</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="card">
+        <h2>📋 Prediction History</h2>
+        <p class="subtitle">All past predictions are stored here for tracking and review</p>
+
+        {% if history %}
+        <div class="table-wrapper">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient Name</th>  <!-- ADD THIS -->
+                        <th>Age</th>            <!-- ADD THIS -->
+                        <th>Gender</th>         <!-- ADD THIS -->
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Risk Score</th>
+                        <th>Risk Level</th>
+                        <th>Contributing Factors</th>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td><strong>{{ item.patient_name }}</strong></td>  <!-- ADD THIS -->
+                        <td>{{ item.patient_age }}</td>                     <!-- ADD THIS -->
+                        <td>{{ item.patient_gender }}</td>                  <!-- ADD THIS -->
+                        <td>
+                            <span class="badge-mini {{ 'badge-malignant' if item.result == 'Malignant' else 'badge-benign' }}">
+                                {{ item.result }}
+                            </span>
+                        </td>
+                        <!-- rest stays the same -->
+
+                        <td>{{ item.confidence }}%</td>
+                        <td>{{ item.risk_score }}%</td>
+                        <td>
+                            <span class="risk-badge-mini level-{{ item.risk_level | lower }}">
+                                {{ item.risk_level }}
+                            </span>
+                        </td>
+                        <td>
+                            <ul class="factor-mini">
+                                {% for f in item.factors %}
+                                <li>{{ f }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ item.doctor }}</td>
+                        <td>{{ item.date }}</td>
+                        <td>
+                            <a href="/delete/{{ item.id }}" class="btn-delete"
+                               onclick="return confirm('Delete this record?')">🗑️</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>📭 No predictions yet. Make your first prediction!</p>
+            <a href="/" class="btn btn-primary">🔍 Start Prediction</a>
+        </div>
+        {% endif %}
+
+        <div class="action-row" style="margin-top: 20px;">
+            <a href="/" class="btn btn-secondary">⬅ Back to Home</a>
+            <a href="/dashboard" class="btn btn-outline">📊 Dashboard</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

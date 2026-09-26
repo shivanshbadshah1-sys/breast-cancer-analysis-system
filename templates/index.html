@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 🎗 Breast Cancer Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">
+  <i class="fas fa-ribbon" style="color:#ff4da6"></i> MedAI Predictor
+</span>
+    <div class="nav-links">
+        <a href="/history">📋 History</a>
+        <a href="/appointment">📅 Appointment</a>
+        <a href="/login">🔐 Dashboard</a>
+    </div>
+</nav>
+
+<!-- In <head> section -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- In your hero section -->
+ <div class="hero">
+ </div>
+
+
+
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <h2>🔬 Enter Medical Parameters</h2>
+        <p class="subtitle">Please provide patient information and clinical measurements</p>
+
+        <form action="/predict" method="post">
+            
+            <!-- Patient Information Section -->
+            <div class="section-header">
+                <h3>👤 Patient Information</h3>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Patient Name *</label>
+                    <input type="text" name="patient_name" 
+                           placeholder="e.g. John Doe" required>
+                    <span class="hint">Full name of the patient</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Age *</label>
+                    <input type="number" name="patient_age" 
+                           placeholder="e.g. 45" min="1" max="120" required>
+                    <span class="hint">Patient's age in years</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Gender *</label>
+                    <select name="patient_gender" class="form-select" required>
+                        <option value="">Select Gender</option>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="hint">Biological gender</span>
+                </div>
+            </div>
+
+            <!-- Clinical Parameters Section -->
+            <div class="section-header">
+                <h3>📊 Clinical Measurements</h3>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Radius Mean *</label>
+                    <input type="number" step="any" name="radius"
+                           placeholder="e.g. 14.5" min="0" required>
+                    <span class="hint">Normal: ≤ 15</span>
+                </div>
+                <div class="form-group">
+                    <label>Texture Mean *</label>
+                    <input type="number" step="any" name="texture"
+                           placeholder="e.g. 19.2" min="0" required>
+                    <span class="hint">Normal: ≤ 20</span>
+                </div>
+                <div class="form-group">
+                    <label>Perimeter Mean *</label>
+                    <input type="number" step="any" name="perimeter"
+                           placeholder="e.g. 92.0" min="0" required>
+                    <span class="hint">Normal: ≤ 100</span>
+                </div>
+                <div class="form-group">
+                    <label>Area Mean *</label>
+                    <input type="number" step="any" name="area"
+                           placeholder="e.g. 655.0" min="0" required>
+                    <span class="hint">Normal: ≤ 700</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">🔍 Analyze & Predict</button>
+        </form>
+    </div>
+
+    <div class="info-cards">
+        <div class="info-card benign-card">
+            <h3>🟢 Benign</h3>
+            <p>Non-cancerous. Cells are not spreading. Regular monitoring advised.</p>
+        </div>
+        <div class="info-card malignant-card">
+            <h3>🔴 Malignant</h3>
+            <p>Cancerous. Cells may spread. Immediate specialist consultation required.</p>
+        </div>
+        <div class="info-card risk-card">
+            <h3>📊 Risk Analysis</h3>
+            <p>Our engine explains WHY the prediction was made with contributing factors.</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chatbot -->
+<div id="chatbot-icon" onclick="toggleChat()" title="Ask Health Assistant">🤖</div>
+
+<div id="chatbox">
+    <div id="chat-header">
+        🤖 Health Assistant
+        <span onclick="toggleChat()" style="float:right; cursor:pointer;">✕</span>
+    </div>
+    <div id="messages"></div>
+    <div id="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ask me anything..."
+               onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
+

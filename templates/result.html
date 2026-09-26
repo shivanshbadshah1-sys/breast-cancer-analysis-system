@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">🎗 MedAI Predictor</span>
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/history">📋 History</a>
+        <a href="/appointment">📅 Appointment</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Main Result -->
+    <div class="card result-card">
+        <h2>📋 Prediction Result</h2>
+
+        {% if result %}
+        <div class="result-badge {{ 'badge-malignant' if result == 'Malignant' else 'badge-benign' }}">
+            {{ '🔴' if result == 'Malignant' else '🟢' }} {{ result }}
+        </div>
+        <p class="confidence-text">Confidence: <strong>{{ confidence }}%</strong></p>
+
+        <div class="prob-row">
+            <div class="prob-item benign-prob">
+                <span class="prob-label">🟢 Benign (Safe)</span>
+                <div class="prob-bar-wrap">
+                    <div class="prob-bar" style="width:  benign; background: #00c9a7;"></div>
+                </div>
+                <span class="prob-value">{{ benign }}%</span>
+            </div>
+            <div class="prob-item malignant-prob">
+                <span class="prob-label">🔴 Malignant (Risk)</span>
+                <div class="prob-bar-wrap">
+                    <div class="prob-bar" style="width:  malignant; background: #ff5252;"></div>
+                </div>
+                <span class="prob-value">{{ malignant }}%</span>
+            </div>
+        </div>
+        {% else %}
+        <p>No result available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Patient Information -->
+    {% if patient_name %}
+    <div class="card patient-info-card">
+        <h3>👤 Patient Information</h3>
+        <div class="patient-grid">
+            <div class="patient-detail">
+                <span class="p-label">Name</span>
+                <span class="p-value">{{ patient_name }}</span>
+            </div>
+            <div class="patient-detail">
+                <span class="p-label">Age</span>
+                <span class="p-value">{{ patient_age }} years</span>
+            </div>
+            <div class="patient-detail">
+                <span class="p-label">Gender</span>
+                <span class="p-value">{{ patient_gender }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Input Summary -->
+    {% if inputs %}
+    <div class="card">
+        <h3>📥 Input Values Submitted</h3>
+        <div class="input-summary">
+            {% for name, val in inputs.items() %}
+            <div class="input-chip">
+                <span class="chip-label">{{ name.capitalize() }}</span>
+                <span class="chip-value">{{ "%.2f"|format(val) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Risk Analysis -->
+    {% if risk_score is not none %}
+    <div class="card risk-card-full">
+        <h3>🔬 Clinical Risk Analysis Engine</h3>
+        <p class="risk-explain">Our engine analyzed your input values against clinical thresholds to explain the prediction.</p>
+
+        <div class="risk-meter-wrap">
+            <div class="risk-meter">
+                <div class="risk-fill"
+                     style="width:  risk_score;
+                     background:  '#ff5252' if risk_level = 'High' else ('#ffab40' if risk_level = 'Medium' else '#00c9a7') ;">
+                </div>
+            </div>
+            <span class="risk-score-label">{{ risk_score }}%</span>
+        </div>
+
+        <div class="risk-level-badge level-{{ risk_level | lower }}">
+            Risk Level: {{ risk_level }}
+        </div>
+
+        <h4>⚠️ Contributing Factors:</h4>
+        <ul class="factor-list">
+            {% for factor in factors %}
+            <li>{{ factor }}</li>
+            {% endfor %}
+        </ul>
+
+        <div class="risk-thresholds">
+            <h4>📏 Clinical Thresholds Reference:</h4>
+            <table class="threshold-table">
+                <tr><th>Feature</th><th>Your Value</th><th>Normal Limit</th><th>Status</th></tr>
+                {% if inputs %}
+                <tr>
+                    <td>Radius</td>
+                    <td>{{ "%.2f"|format(inputs.radius) }}</td>
+                    <td>≤ 15</td>
+                    <td class="{{ 'status-high' if inputs.radius | float > 15 else 'status-ok' }}">
+                        {{ '⚠️ High' if inputs.radius | float > 15 else '✅ Normal' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Texture</td>
+                    <td>{{ "%.2f"|format(inputs.texture) }}</td>
+                    <td>≤ 20</td>
+                    <td class="{{ 'status-high' if inputs.texture | float > 20 else 'status-ok' }}">
+                        {{ '⚠️ High' if inputs.texture | float > 20 else '✅ Normal' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Perimeter</td>
+                    <td>{{ "%.2f"|format(inputs.perimeter) }}</td>
+                    <td>≤ 100</td>
+                    <td class="{{ 'status-high' if inputs.perimeter | float > 100 else 'status-ok' }}">
+                        {{ '⚠️ High' if inputs.perimeter | float > 100 else '✅ Normal' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Area</td>
+                    <td>{{ "%.2f"|format(inputs.area) }}</td>
+                    <td>≤ 700</td>
+                    <td class="{{ 'status-high' if inputs.area | float > 700 else 'status-ok' }}">
+                        {{ '⚠️ High' if inputs.area | float > 700 else '✅ Normal' }}
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Clinical Recommendations -->
+    {% if recommendations %}
+    <div class="card recommendations-card">
+        <h3>💊 Clinical Recommendations & Treatment Plan</h3>
+        
+        <!-- Treatment Options -->
+        {% if recommendations.treatment %}
+        <div class="rec-section">
+            <h4>🏥 Recommended Treatment</h4>
+            <ul class="rec-list">
+                {% for item in recommendations.treatment %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Surgery Recommendation -->
+        {% if recommendations.surgery %}
+        <div class="rec-section surgery-section">
+            <h4>🔪 Surgical Intervention</h4>
+            <div class="surgery-box">
+                <div class="surgery-type">{{ recommendations.surgery.type }}</div>
+                <p class="surgery-desc">{{ recommendations.surgery.description }}</p>
+                <div class="surgery-urgency {{ 'urgency-high' if 'High' in recommendations.surgery.urgency else 'urgency-medium' }}">
+                    ⏰ {{ recommendations.surgery.urgency }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Medication -->
+        {% if recommendations.medication %}
+        <div class="rec-section">
+            <h4>💊 Medication & Therapy</h4>
+            <ul class="rec-list medication-list">
+                {% for med in recommendations.medication %}
+                <li>{{ med }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Follow-up -->
+        {% if recommendations.followup %}
+        <div class="rec-section">
+            <h4>📅 Follow-up Schedule</h4>
+            <ul class="rec-list">
+                {% for item in recommendations.followup %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Lifestyle Changes -->
+        {% if recommendations.lifestyle %}
+        <div class="rec-section">
+            <h4>🌟 Lifestyle Recommendations</h4>
+            <ul class="rec-list lifestyle-list">
+                {% for item in recommendations.lifestyle %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="disclaimer">
+            ⚠️ <strong>Disclaimer:</strong> These recommendations are AI-generated based on input data. 
+            Always consult with qualified healthcare professionals for personalized medical advice.
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Doctor Recommendation -->
+    {% if doctor %}
+    <div class="card doctor-card">
+        <h3>👨‍⚕️ Doctor Recommendation</h3>
+        <div class="doctor-grid">
+            <div class="doctor-detail"><span class="d-label">Specialty</span><span class="d-value">{{ doctor.type }}</span></div>
+            <div class="doctor-detail"><span class="d-label">Doctor</span><span class="d-value">{{ doctor.name }}</span></div>
+            <div class="doctor-detail"><span class="d-label">Hospital</span><span class="d-value">{{ doctor.hospital }}</span></div>
+            <div class="doctor-detail"><span class="d-label">Contact</span><span class="d-value">{{ doctor.contact }}</span></div>
+        </div>
+        <div class="doctor-advice">💡 {{ doctor.advice }}</div>
+        <a href="/appointment" class="btn btn-danger" style="margin-top:15px; display:inline-block;">
+            📅 Book Appointment
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-row">
+        <a href="/" class="btn btn-secondary">⬅ New Prediction</a>
+        <a href="/prescription" class="btn btn-danger">💊 View Prescription</a>
+        <a href="/dietary" class="btn btn-primary">🥗 View Dietary Guide</a>
+        <a href="/history" class="btn btn-outline">📋 View History</a>
+    </div>
+
+</div>
+
+<!-- Chatbot -->
+<div id="chatbot-icon" onclick="toggleChat()" title="Ask Health Assistant">🤖</div>
+<div id="chatbox">
+    <div id="chat-header">
+        🤖 Health Assistant
+        <span onclick="toggleChat()" style="float:right; cursor:pointer;">✕</span>
+    </div>
+    <div id="messages"></div>
+    <div id="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ask me anything..."
+               onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">
+  <i class="fas fa-ribbon" style="color:#ff4da6"></i> MedAI Predictor
+</span>
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/history">📋 History</a>
+        <a href="/logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <h2>📊 Admin Dashboard</h2>
+
+        <!-- Chart -->
+        <h3>Prediction Distribution</h3>
+        {% if benign > 0 or malignant > 0 %}
+        <div style="max-width: 350px; margin: 20px auto;">
+            <canvas id="predChart"></canvas>
+        </div>
+        <div style="text-align: center; margin-top: 15px; color: #aaa;">
+            <span style="color: #00c9a7; font-weight: 600;">● Benign: {{ benign }}</span> | 
+            <span style="color: #ff5252; font-weight: 600;">● Malignant: {{ malignant }}</span>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #666; padding: 20px;">
+            📭 No predictions yet. Upload a CSV file to see the distribution.
+        </p>
+        {% endif %}
+
+        <!-- Bulk Upload -->
+        <hr style="margin: 30px 0; border-color: #444;">
+        <h3>📂 Bulk CSV Prediction</h3>
+        <p class="subtitle">Upload a CSV with columns: radius, texture, perimeter, area</p>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="upload-area">
+                <input type="file" name="file" accept=".csv" required>
+                <button type="submit" class="btn btn-primary">Upload & Predict</button>
+            </div>
+        </form>
+
+        {% if table %}
+        <h3 style="margin-top: 30px;">Bulk Prediction Results</h3>
+        <div class="table-wrapper">
+            {{ table | safe }}
+        </div>
+        <div class="action-row" style="margin-top: 15px;">
+            <a href="{{ download_link }}" class="btn btn-outline" download>⬇ Download CSV</a>
+            <a href="/download_pdf" class="btn btn-secondary">📄 Download PDF</a>
+        </div>
+        {% endif %}
+
+        <div class="action-row" style="margin-top: 25px;">
+            <a href="/history" class="btn btn-outline">📋 View History</a>
+            <a href="/" class="btn btn-secondary">⬅ Back to Home</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+(function() {
+    const benign = Number("{{ benign | default(0) }}");
+    const malignant = Number("{{ malignant | default(0) }}");
+    
+    // Only create chart if there's data
+    if (benign > 0 || malignant > 0) {
+        const ctx = document.getElementById("predChart");
+        
+        if (ctx && typeof Chart !== "undefined") {
+            new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: ["Benign", "Malignant"],
+                    datasets: [{
+                        data: [benign, malignant],
+                        backgroundColor: ["#00c9a7", "#ff5252"],
+                        borderColor: ["#00c9a7", "#ff5252"],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                color: "#e0e0e0",
+                                font: {
+                                    size: 14,
+                                    family: "'Poppins', sans-serif"
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: "#1e1e2f",
+                            titleColor: "#00c9a7",
+                            bodyColor: "#e0e0e0",
+                            borderColor: "#2a2a40",
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = benign + malignant;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Highlight Malignant cells in table
+    document.querySelectorAll("td").forEach(cell => {
+        if (cell.textContent.trim() === "Malignant") {
+            cell.style.color = "#ff5252";
+            cell.style.fontWeight = "bold";
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Prescription</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="nav-brand">🎗 MedAI Predictor</span>
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/history">📋 History</a>
+        <a href="/appointment">📅 Appointment</a>
+    </div>
+</nav>
+
+<div class="container">
+    
+    <!-- Prescription Header -->
+    <div class="card prescription-header">
+        <h2>💊 Medical Prescription</h2>
+        <p style="color: #0b0e0b; font-size: 14px; margin-bottom: 20px;">Dosage and medication recommendations</p>
+        
+        <div class="prescription-info">
+            <div class="info-row">
+                <span class="info-label">Prescription ID:</span>
+                <span class="info-value">{{ patient_info.prescription_id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Date:</span>
+                <span class="info-value">{{ patient_info.date }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Patient Name:</span>
+                <span class="info-value">{{ patient_info.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Age / Gender:</span>
+                <span class="info-value">{{ patient_info.age }} / {{ patient_info.gender }}</span>
+            </div>
+        </div>
+
+
+        
+        <div class="diagnosis-box">
+            <strong>Diagnosis:</strong> {{ diagnosis }}<br>
+            <strong>Risk Level:</strong> <span class="risk-badge risk-{{ risk_level | lower }}">{{ risk_level }}</span>
+        </div>
+    </div>
+
+    <!-- Medications -->
+    <div class="card medications-card">
+        <h3>💊 Prescribed Medications</h3>
+        
+        <div class="medications-list">
+            {% for med in medications %}
+            <div class="medication-item">
+                <div class="med-header">
+                    <span class="med-name">{{ loop.index }}. {{ med.name }}</span>
+                    <span class="med-dosage">{{ med.dosage }}</span>
+                </div>
+                <div class="med-details">
+                    <div class="med-detail">
+                        <span class="detail-label">Frequency:</span>
+                        <span class="detail-value">{{ med.frequency }}</span>
+                    </div>
+                    <div class="med-detail">
+                        <span class="detail-label">Duration:</span>
+                        <span class="detail-value">{{ med.duration }}</span>
+                    </div>
+                </div>
+                <div class="med-purpose">
+                    <strong>Purpose:</strong> {{ med.purpose }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card instructions-card">
+        <h3>📋 Instructions</h3>
+        <ul class="instructions-list">
+            {% for instruction in instructions %}
+            <li>{{ instruction }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Warnings -->
+    <div class="card warnings-card">
+        <h3>⚠️ Important Warnings</h3>
+        <ul class="warnings-list">
+            {% for warning in warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Follow-up -->
+    <div class="card followup-card">
+        <h3>📅 Follow-up Schedule</h3>
+        <p class="followup-text">{{ follow_up }}</p>
+    </div>
+
+    <!-- Doctor Signature -->
+    <div class="card signature-card">
+        <div class="signature-line">_______________________________</div>
+        <div class="doctor-name">Dr. Rajiv Sharma, MD</div>
+        <div class="doctor-title">Oncologist | AIIMS Delhi</div>
+        <div class="doctor-license">License No: MED-2024-12345</div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-row">
+        <a href="javascript:history.back()" class="btn btn-secondary">⬅ Back</a>
+        <a href="/download-prescription" class="btn btn-danger">📥 Download PDF</a>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Print</button>
+    </div>
+
+    <div class="disclaimer-box">
+        <strong>⚠️ Medical Disclaimer:</strong> This prescription is AI-generated for informational purposes. 
+        Always consult with a licensed healthcare provider before starting any medication. 
+        Do not use this as a substitute for professional medical advice.
+    </div>
+
+</div>
+
+</body>
+</html>
